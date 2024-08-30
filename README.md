@@ -33,23 +33,23 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 >
 
 ## Reproducing figures, tables, and results
-
-### Simulations (Section 3)
-
-### Daynamica Analysis (Section 4)
+>
+> ### Simulations (Section 3)
+>
+> ### Daynamica Analysis (Section 4)
 
 ##  Example notebooks for running code
-
-### Simulation
-
-### Run AMDC on any data
+>
+> ### Simulation
+>
+> ### Run AMDC on any data
 
 ## Run analysis from R/python or shell scrips
-
-### Simulation
-
-### Stability Analysis
-
-### Computational time analysis
+>
+> ### Simulation
+>
+> ### Stability Analysis
+>
+> ### Computational time analysis
 
 
