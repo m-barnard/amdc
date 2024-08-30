@@ -3,8 +3,11 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 
 # Table of contents
 [Data Documentation](#data-see-daynamica_analysis)
+
 [Replicating figures, tables and results](#reproducing-figures-tables-and-results)
+
   [Simulation](#simulations-section-3)
+  
   [Daynamica Analysis](#daynamica-analysis-section-4)
 
 ## Data (see daynamica_analysis/)
@@ -35,7 +38,7 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 
 ### Daynamica Analysis (Section 4)
 
-## Code running example notebooks
+##  Example notebooks for running code
 
 ### Simulation
 
