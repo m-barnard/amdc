@@ -6,21 +6,21 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 > 
 > raw_data/processed_ucal_items_without_surveys_small.csv data dictionary
 >
-| Variable | Meaning |
-|---|---|
-| user_id | Unique user identifyer |
-| type | Describes episode: either ACTIVITY or TRIP |
-| subtype | Describes activity/trip category of episode: <br>HOME, CAR, PERSONAL_BUSINESS, <br>LEISURE_RECREATION, EAT_OUT,WALK, <br>SHOP, OTHER, WORK, EDUCATION, <br>BIKE, RAIL, BUS |
-| start_posix | Start date and time of the episode |
-| end_posix | End date and time of the episode |
+> | Variable | Meaning |
+> |---|---|
+> | user_id | Unique user identifyer |
+> | type | Describes episode: either ACTIVITY or TRIP |
+> | subtype | Describes activity/trip category of episode: <br>HOME, CAR, PERSONAL_BUSINESS, <br>LEISURE_RECREATION, EAT_OUT,WALK, <br>SHOP, OTHER, WORK, EDUCATION, > ><br>BIKE, RAIL, BUS |
+> | start_posix | Start date and time of the episode |
+> | end_posix | End date and time of the episode |
 >
 > clean_data/survey_data.csv
 >
-| Variable | Meaning |
-|---|---|
-| user_id | Unique user identifyer |
-| eod_survey_date | Date of the end of day survey |
-| contract_c19 | Response to question about COVID-19 concern<br>Options:Strongly Disagree, Disagree, Unsure,<br>Agree, Strongly Agree |
+> | Variable | Meaning |
+> |---|---|
+> | user_id | Unique user identifyer |
+> | eod_survey_date | Date of the end of day survey |
+> | contract_c19 | Response to question about COVID-19 concern<br>Options:Strongly Disagree, Disagree, Unsure,<br>Agree, Strongly Agree |
 >
 
 ## Reproducing figures, tables, and results
