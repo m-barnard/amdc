@@ -1,3 +1,5 @@
+nav:
+  - index.md
 title: amdc_clustering
 remote_theme: pages-themes/cayman@v0.2.0
 plugins:
