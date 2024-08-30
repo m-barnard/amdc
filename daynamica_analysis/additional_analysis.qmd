@@ -1,0 +1,187 @@
+---
+title: "Mixed Effects Model, Stability Analysis, and Computational Time"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Load packages and source files
+
+```{r}
+library(readr)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(tidyr)
+library(lme4)
+library(stringr)
+library(kableExtra)
+library(viridis)
+library(cowplot)
+source('scripts/run_mat_hier.R')
+```
+
+## Mixed Effects Model
+
+### Run day sequence analysis
+
+```{r}
+out <- run_sim('clean_data/clean_day_seqs.csv', 'clean_data/clean_day_distmat.rds', 2, 9)
+metric <- out[[1]]
+df <- out[[2]] %>%
+  rename(seq = seqs)
+```
+
+### Prep data
+
+```{r}
+join_df <- df %>%
+  dplyr::select(uniq_id, user_id, start_date, clust8_EV1234) %>%
+  mutate(cluster = as.factor(clust8_EV1234))
+
+survey_df <- read_csv('clean_data/survey_data.csv')
+
+mod_df <- join_df %>%
+  left_join(survey_df, by = c('user_id', 'start_date' = 'eod_survey_date')) %>%
+  drop_na() %>%
+  mutate(contract_c19_bin = ifelse(contract_c19 %in% c("Strongly Disagree", "Disagree"), 0, 1))
+```
+
+### Supplementary Table 2
+
+```{r}
+mod_contract <- glmer(contract_c19_bin~cluster+(1|user_id), family = 'binomial', data = mod_df)
+coef_table <- summary(mod_contract)$coefficients
+sort_vals <- df %>%
+  group_by(clust8_EV1234) %>%
+  summarize(n = n()/nrow(df)) %>%
+  arrange(desc(n))
+supp_table2 <- data.frame('Coefficient' = c('Intercept', 'B', 'C', 'D', 'E', 'F', 'G', 'H'), 'Estimate' = unname(round(coef_table[,1][sort_vals$clust8_EV1234],2)), 'OR' = unname(round(exp(coef_table[,1][sort_vals$clust8_EV1234]),2)), 'SE' = unname(round(coef_table[,2][sort_vals$clust8_EV1234],2)), 'p-value' = unname(round(coef_table[,4][sort_vals$clust8_EV1234],2)))
+
+supp_table2 %>%
+  kbl(format = "html", escape = F) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+## Stability Analysis
+
+```{r}
+res_files <-paste0(seq(1, 20), '.rds')
+all_res <- lapply( paste0('results_stability/',res_files), read_rds)
+all_df <- do.call(rbind, all_res) 
+all_df <- all_df %>%
+  mutate(clust_num = str_sub(best_clust, 6, 6))
+ggplot(all_df, aes(x = as.factor(clust_num), fill = as.factor(clust_num))) +
+  geom_bar() +
+  theme_bw() +
+  guides(fill = 'none')+
+  labs(x = 'Best # of Clusters', y = 'Number of Bootstrapped Datasets')
+
+all_df <- all_df %>%
+  left_join(join_df, by = 'uniq_id')
+
+agg_df1 <- all_df %>%
+  group_by(uniq_id, clust8_EV1234) %>%
+  summarise(jac = mean(jac)) %>%
+  ungroup()
+print(paste0('Mean stability ', round(mean(agg_df1$jac),2)))
+print(paste0('Median stability ', round(median(agg_df1$jac),2)))
+
+agg_df1 %>%
+  group_by(clust8_EV1234) %>%
+  summarise(`median stability` = median(jac)) %>%
+  mutate(cluster = c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H')[sort_vals$clust8_EV1234]) %>%
+  dplyr::select(cluster, `median stability`) %>% 
+  arrange(cluster) %>%
+  kbl(format = "html", escape = F) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+agg_df1 %>%
+  group_by(clust8_EV1234) %>%
+  summarise(`mean stability` = mean(jac)) %>%
+  mutate(cluster = c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H')[sort_vals$clust8_EV1234]) %>%
+  dplyr::select(cluster, `mean stability`) %>% 
+  arrange(cluster) %>%
+  kbl(format = "html", escape = F) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+## Computational Time
+
+```{r, fig.height = 4, fig.width = 5}
+### day prep times ###
+hier_day_prep_df <- read_rds('results_time/prep_day_hier.rds')
+hier_day_prep <- hier_day_prep_df$elapsed[1]/hier_day_prep_df$replications[1]
+mat_day_prep_df <- read_rds('results_time/prep_day_mat.rds')
+mat_day_prep <- mat_day_prep_df$elapsed[1]/mat_day_prep_df$replications[1]
+ntree_day_prep_df <- read_delim("results_time/ntrees_prep_day.txt", delim = "\t", col_names = F) 
+ntree_day_prep <- mean(ntree_day_prep_df$X1)
+
+print(paste0('Data preparation (day): AMDC is ', round(hier_day_prep/mat_day_prep, 2), ' times faster than hierarchical clusering'))
+print(paste0('Data preparation (day): AMDC is ', round(ntree_day_prep/mat_day_prep, 2), ' times faster than nTreeClus'))
+
+
+### day analysis times ###
+hier_day_df <- read_rds('results_time/clust_day_hier.rds')
+hier_day <- hier_day_df$elapsed[1]/hier_day_df$replications[1] + hier_day_prep
+mat_day_df <- read_rds('results_time/clust_day_mat.rds')
+mat_day <- mat_day_df$elapsed[1]/mat_day_df$replications[1] + mat_day_prep
+ntree_day_df <- read_delim("results_time/ntrees_day.txt", delim = "\t", col_names = F) 
+ntree_day <- mean(ntree_day_df$X1)
+print(paste0('Full clustering procedure (day): AMDC is ', round(hier_day/mat_day,2), ' times faster than hierarchical clusering'))
+print(paste0('Full clustering procedure (day): AMDC is ', round(ntree_day/mat_day,2), ' times faster than nTreeClus'))
+
+day_time_df <- data.frame('time' = c(hier_day_prep, ntree_day_prep, mat_day_prep, hier_day, ntree_day, mat_day), type = c(rep('Data Preparation', 3), rep('Full Clustering Procedure', 3)), method = c(rep(c('Hierarchical','nTreeClus', 'AMDC'), 2))) %>%
+  mutate(time = time/60) %>%
+  mutate(method = factor(method, levels = c('Hierarchical','nTreeClus', 'AMDC')))
+
+p1 <- ggplot(day_time_df, aes(x = method, y = time, fill = method)) +
+  geom_bar(stat = 'identity') +
+  theme_bw() +
+  labs(y = 'Time (min)', x = '') +
+  guides(fill = 'none') +
+  ggtitle('Day sequences') +
+  theme(title = element_text(size = 10)) +
+  scale_fill_viridis(option = 'A', begin = 0.2, end = 0.8, direction = -1, discrete = T) +
+  facet_wrap(~type, ncol = 2)
+
+
+
+### week prep times ###
+hier_week_prep_df <- read_rds('results_time/prep_week_hier.rds')
+hier_week_prep <- hier_week_prep_df$elapsed[1]/hier_week_prep_df$replications[1]
+mat_week_prep_df <- read_rds('results_time/prep_week_mat.rds')
+mat_week_prep <- mat_week_prep_df$elapsed[1]/mat_week_prep_df$replications[1]
+ntree_week_prep_df <- read_delim("results_time/ntrees_prep_week.txt", delim = "\t", col_names = F) 
+ntree_week_prep <- mean(ntree_week_prep_df$X1)
+print(paste0('Data preparation (week): AMDC is ', round(hier_week_prep/mat_week_prep, 2), ' times faster than hierarchical clusering'))
+print(paste0('Data preparation (week): AMDC is ', round(ntree_week_prep/mat_week_prep, 2), ' times faster than nTreeClus'))
+
+### week analysis times ###
+hier_week_df <- read_rds('results_time/clust_week_hier.rds')
+hier_week <- hier_week_df$elapsed[1]/hier_week_df$replications[1] + hier_week_prep
+mat_week_df <- read_rds('results_time/clust_week_mat.rds')
+mat_week <- mat_week_df$elapsed[1]/mat_week_df$replications[1] + mat_week_prep
+ntree_week_df <- read_delim("results_time/ntrees_week.txt", delim = "\t", col_names = F) 
+ntree_week <- mean(ntree_week_df$X1)
+print(paste0('Full clustering procedure (week): AMDC is ', round(hier_week/mat_week, 2), ' times faster than hierarchical clusering'))
+print(paste0('Full clustering procedure (week): AMDC is ', round(ntree_week/mat_week, 2), ' times faster than nTreeClus'))
+
+week_time_df <- data.frame('time' = c(hier_week_prep, ntree_week_prep, mat_week_prep, hier_week, ntree_week, mat_week), type = c(rep('Data Preparation', 3), rep('Full Clustering Procedure', 3)), method = c(rep(c('Hierarchical','nTreeClus', 'AMDC'), 2))) %>%
+  mutate(time = time/60) %>%
+  mutate(method = factor(method, levels = c('Hierarchical','nTreeClus', 'AMDC')))
+
+p2 <- ggplot(week_time_df, aes(x = method, y = time, fill = method)) +
+  geom_bar(stat = 'identity') +
+  theme_bw() +
+  labs(y = 'Time (min)', x = '') +
+  ggtitle('Week sequences') +
+  theme(title = element_text(size = 10)) +
+  guides(fill = 'none') +
+  scale_fill_viridis(option = 'A', begin = 0.2, end = 0.8, direction = -1, discrete = T) +
+  facet_wrap(~type, ncol = 2)
+
+plot_grid(p1, p2, nrow = 2)
+```

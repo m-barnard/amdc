@@ -1,0 +1,74 @@
+---
+title: "Run AMDC for any data"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Load packages and source files
+
+```{r}
+library(dplyr)
+library(readr)
+library(stringr)
+library(tibble)
+library(tidyr)
+library(parallel)
+source('src/run_functions/run_amdc.R')
+```
+
+### Create/load sequence data
+
+You can use any data of here that has a column named 'seqs' where each observation of this column has a sequence (i.e., AAAABBBBBAAAACCCC)
+
+```{r}
+#### LOAD OWN DATA HERE AND COMMENT OUT BELOW ####
+```
+
+```{r}
+seq_base <- rep('A', 100)
+seq_gen <- lapply(seq(1, 200), function(x){
+  set.seed(x)
+  vec <- seq_base
+  if(x %% 3 == 0){
+    num_b <- round(runif(1, min = 1, max = 50))
+    indices_b <- sample(seq(1, 100), num_b)
+    vec[indices_b] <- 'B'
+  } else if(x %% 3 == 1){
+    num_c <- round(runif(1, min = 1, max = 50))
+    indices_c <- sample(seq(1, 100), num_c)
+    vec[indices_c] <- 'C'
+  } else{
+    num_b <- round(runif(1, min = 1, max = 30))
+    indices_b <- sample(seq(1, 100), num_b)
+    num_c <- round(runif(1, min = 1, max = 30))
+    indices_c <- sample(seq(1, 100)[!(seq(1, 100) %in% indices_b)], num_c)
+     vec[indices_b] <- 'B'
+     vec[indices_c] <- 'C'
+  }
+  return(vec)
+})
+seqs <- sapply(seq_gen, function(x){paste0(x, collapse = '')})
+df <- data.frame('seqs' = seqs)
+```
+
+## Run method
+
+Second and third arguments are the minimum and maximum \# of clusters you want to explore. Note that the maximum \# is capped at 9. get_metrics_mat() in src/run_functions/method_functions.R would have to be edited to explore more than 9 clusters.
+
+```{r}
+out <- run_amdc(df, 2, 9)
+metrics <- out[[1]]
+res_df <- out[[2]]
+head(metrics)
+head(res_df)
+```
+
+There are two output datasets:
+
+1.  metrics: contains the cluster evaluation metric for the range of cluster numbers specified in the second and third arguments.
+
+2.  res_df: contains all columns in the original dataset (df) the column vectors of $V$ (principal axes) and all cluster assignments

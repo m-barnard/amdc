@@ -1,0 +1,181 @@
+---
+title: "Weighted Day Sequence Analysis Figures"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Load packages and source file
+
+```{r}
+library(readr)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(cowplot)
+library(tidyr)
+source('src/plot_functions.R')
+source('scripts/run_mat_hier.R')
+```
+
+Note: to run this, you can either directly load in the original AMDC day sequence cluster results in results/day_sequence_amdc_lasagna.rds OR recreate this saved file by running figures_day_analysis.qmd
+
+## Weight of 2: run clustering results and prep data
+
+```{r}
+out3 <- run_sim('clean_data/clean_day_seqs.csv', 'clean_data/clean_day_distmat.rds', 2, 9, weight = '9_5', weight_val = 2)
+metric3 <- out3[[1]]
+df3 <- out3[[2]]
+mat_las3 <- create_lasagna_df('clust8_EV1234', df3)
+mat_las <- read_rds('results/day_sequence_amdc_lasagna.rds')
+```
+
+### Get legend + white space for all plots
+
+```{r}
+plot_df <- mat_las %>%
+  mutate(State = ifelse(State == 'H', 'Home', ifelse(State == 'O', 'Out',
+        ifelse(State == 'T', 'Transport', ifelse(State == 'W', 'Work', NA)))))
+p1 <- plot_lasagna(plot_df, 'clust8_EV1234', 1) + theme(legend.position="bottom", legend.title=element_text(size=15), 
+    legend.text=element_text(size=14))
+legend_b <- cowplot::get_plot_component(p1, 'guide-box-bottom')
+
+white_space <- ggplot() +
+  theme_void()
+```
+
+## Figure 4
+
+```{r, warning = FALSE, fig.height = 5.5, fig.width =6.5}
+join_mat <- mat_las %>%
+  rename(old_clust = clust8_EV1234) %>%
+  dplyr::select(uniq_id,old_clust)
+mat_las3 <- mat_las3  %>%
+  mutate(old_clust = join_mat$old_clust) %>%
+  mutate(diff_clust = ifelse((clust8_EV1234 == 1 & old_clust == 8) | (clust8_EV1234 == 7 & old_clust == 1) | (clust8_EV1234 == 8 & old_clust == 6), 'Same Cluster', 'Different Cluster'))
+
+plot_df <- mat_las3 %>%
+  mutate(State = ifelse(State == 'H', 'Home', ifelse(State == 'O', 'Out',
+        ifelse(State == 'T', 'Transport', ifelse(State == 'W', 'Work', NA)))))
+p1 <- plot_lasagna_alpha(plot_df, 'clust8_EV1234', 1) +
+  labs(alpha = '') +
+  guides(fill = guide_legend(order = 1)) +
+  theme(legend.position="bottom", legend.box = 'vertical',legend.title=element_text(size=10), 
+    legend.text=element_text(size=9))
+legend_b2 <- cowplot::get_plot_component(p1, 'guide-box-bottom')
+  
+mat1 <- plot_lasagna_alpha(mat_las3, 'clust8_EV1234', 1) +
+  theme(legend.position="none", axis.text.x = element_text(size = 9))
+mat2 <- plot_lasagna_alpha(mat_las3, 'clust8_EV1234', 2) +
+  theme(legend.position="none", axis.text.x = element_text(size = 9))
+mat3 <- plot_lasagna_alpha(mat_las3, 'clust8_EV1234', 7) +
+  theme(legend.position="none", axis.text.x = element_text(size = 9))
+mat4 <- plot_lasagna_alpha(mat_las3, 'clust8_EV1234', 8) +
+  theme(legend.position="none", axis.text.x = element_text(size = 9))
+
+
+mat_p <- plot_grid(mat1, mat2, mat3, mat4, labels = c('A) 18.6%', 'B) 7.9%', 'C) 48.9%', 'D) 7.3'), nrow = 2,label_y = 1.04, label_x = -0.01, label_size = 11)
+
+
+final <- plot_grid(white_space, mat_p, white_space, legend_b2, white_space,  axis = 'l', nrow = 5, rel_heights = c(1, 20, 1, .8,1))
+final
+```
+
+## Supplementary Figure 10
+
+```{r, warning=FALSE, fig.height = 12, fig.width =6.5}
+sort_vals <- df3 %>%
+  group_by(clust8_EV1234) %>%
+  summarize(n = n()/nrow(df3)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$clust8_EV1234, function(x){
+  plot <- plot_lasagna(mat_las3, 'clust8_EV1234', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+
+percs <- round(sort_vals$n, 3)*100
+percs[3] <- 9.0 #so it sums to 100
+letters <- c('A) ', 'B) ', 'C) ' , 'D) ', 'E) ', 'F) ', 'G) ', 'H) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+mat_p <- plot_grid(plotlist = all_plots, labels = labels, nrow = 4,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+final <- plot_grid(white_space, mat_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 20, 0.6, .4,0.7))
+final
+```
+
+## Weight of 1.5: run clustering results and prep data
+
+```{r}
+out3 <- run_sim('clean_data/clean_day_seqs.csv', 'clean_data/clean_day_distmat.rds', 2, 9, weight = '9_5', weight_val = 1.5)
+metric3 <- out3[[1]]
+df3 <- out3[[2]]
+mat_las3 <- create_lasagna_df('clust8_EV1234', df3)
+```
+
+## Supplementary Figure 11
+
+```{r,warning=FALSE, fig.height = 12, fig.width =6.5}
+sort_vals <- df3 %>%
+  group_by(clust8_EV1234) %>%
+  summarize(n = n()/nrow(df3)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$clust8_EV1234, function(x){
+  plot <- plot_lasagna(mat_las3, 'clust8_EV1234', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+
+percs <- round(sort_vals$n, 3)*100
+letters <- c('A) ', 'B) ', 'C) ' , 'D) ', 'E) ', 'F) ', 'G) ', 'H) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+mat_p <- plot_grid(plotlist = all_plots, labels = labels, nrow = 4,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+
+final <- plot_grid(white_space, mat_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 20, 0.6, .4,0.7))
+final
+```
+
+## Weight of 2.5: run clustering results and prep data
+
+```{r}
+out3 <- run_sim('clean_data/clean_day_seqs.csv', 'clean_data/clean_day_distmat.rds', 2, 9, weight = '9_5', weight_val = 2.5)
+metric3 <- out3[[1]]
+df3 <- out3[[2]]
+mat_las3 <- create_lasagna_df('clust9_EV1234', df3)
+```
+
+## Supplementary Figure 12
+
+```{r, warning = FALSE, fig.height = 10, fig.width =9}
+sort_vals <- df3 %>%
+  group_by(clust9_EV1234) %>%
+  summarize(n = n()/nrow(df3)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$clust9_EV1234, function(x){
+  plot <- plot_lasagna(mat_las3, 'clust9_EV1234', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+
+percs <- round(sort_vals$n, 3)*100
+percs[9] <- 1.5 #get to sum to 100
+letters <- c('A) ', 'B) ', 'C) ' , 'D) ', 'E) ', 'F) ', 'G) ', 'H) ', 'I) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+mat_p <- plot_grid(plotlist = all_plots, labels = labels, nrow = 3,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+white_space <- ggplot() +
+  theme_void()
+
+final <- plot_grid(white_space, mat_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 16, 0.6, .4,0.7))
+final
+```
