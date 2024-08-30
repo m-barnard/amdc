@@ -1,0 +1,192 @@
+---
+title: "Day Sequence Analysis Figures"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Load packages and source file
+
+```{r}
+library(readr)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(cowplot)
+library(tidyr)
+source('src/plot_functions.R')
+source('scripts/run_mat_hier.R')
+```
+
+Note: to run this, you can either directly load in nTreeClus results files in results/amdc_ntrees.csv OR recreate this saved file by running nTreeClus on daynamica data with run_nTreeClus_daynamica.ipynb.
+
+## Run/load in clustering results and prep data
+
+```{r}
+out <- run_sim('clean_data/clean_day_seqs.csv', 'clean_data/clean_day_distmat.rds', 2, 9)
+metric <- out[[1]]
+df <- out[[2]] %>%
+  rename(seq = seqs)
+ntrees_df <- read_csv('results/amdc_ntrees.csv') %>%
+  rename(seq = seqs)
+```
+
+```{r}
+hier_las <- create_lasagna_df('clust2', df)
+hier_m_las <- create_lasagna_df('clust8', df)
+mat_las <- create_lasagna_df('clust8_EV1234', df)
+write_rds(mat_las, 'results/day_sequence_amdc_lasagna.rds')
+ntrees_RF_las <- create_lasagna_df('ntrees_RF', ntrees_df)
+ntrees_RF_p_las <- create_lasagna_df('ntrees_RF_p', ntrees_df)
+```
+
+### Get legend + white space for all plots
+
+```{r}
+plot_df <- hier_las %>%
+  mutate(State = ifelse(State == 'H', 'Home', ifelse(State == 'O', 'Out',
+        ifelse(State == 'T', 'Transport', ifelse(State == 'W', 'Work', NA)))))
+p1 <- plot_lasagna(plot_df, 'clust2', 1) + theme(legend.position="bottom", legend.title=element_text(size=15), 
+    legend.text=element_text(size=14))
+legend_b <- cowplot::get_plot_component(p1, 'guide-box-bottom')
+
+white_space <- ggplot() +
+  theme_void()
+```
+
+## Figure 2
+
+```{r, warning = FALSE, fig.height = 13, fig.width =7}
+hier1 <- plot_lasagna(hier_las, 'clust2', 1) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+hier2 <- plot_lasagna(hier_las, 'clust2', 2) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+
+
+#choosing the 4 ones that the first cluster splits into
+mat1 <- plot_lasagna(mat_las, 'clust8_EV1234', 1) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+mat2 <- plot_lasagna(mat_las, 'clust8_EV1234', 3) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+mat3 <- plot_lasagna(mat_las, 'clust8_EV1234', 6) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+mat4 <- plot_lasagna(mat_las, 'clust8_EV1234', 8) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+
+p1 <- plot_lasagna(ntrees_RF_las, 'ntrees_RF', 0) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+p2 <- plot_lasagna(ntrees_RF_las, 'ntrees_RF', 1) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+p3 <- plot_lasagna(ntrees_RF_las, 'ntrees_RF', 6) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+p4 <- plot_lasagna(ntrees_RF_las, 'ntrees_RF', 3) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+
+
+hier_p <- plot_grid(hier1, hier2, labels = c('A) 96.9%', 'B) 3.1%'), label_y = 1.02, label_x = -0.03, label_size = 12)
+mat_p <- plot_grid(mat1, mat4, mat2, mat3, labels = c('A) 54.4%', 'B) 23.6%', 'C) 8.6%', 'D) 5.2%'), nrow = 2,label_y = 1.02, label_x = -0.03, label_size = 12)
+ntrees_p <- plot_grid(p1, p2, p3, p4, labels = c('A) 67%', 'B) 20.3%', 'C) 2.9%', 'D) 2.7%'), nrow = 2,label_y = 1.02, label_x = -0.03, label_size = 12)
+
+final <- plot_grid(white_space, hier_p, white_space, mat_p, white_space, ntrees_p, legend_b, white_space, labels = c('', '1) Hierarchical','', '2) Adjacency Matrix','', '3) nTreeClus'), axis = 'l', nrow = 8, rel_heights = c(0.7, 10,0.7, 20,0.55, 20, 0.7, 0.7), rel_widths = c(1, 1, 1,1,1, 1, 1.2, 1), scale = 0.95, label_y = c(1, 1.08,1,1.03,1, 1.03), label_x = c(0,-0.09,0,-0.12, 0, -0.075))
+final
+```
+
+## Supplementary Figure 4
+
+```{r, warning=FALSE, fig.height = 12, fig.width =6.5}
+sort_vals <- ntrees_df %>%
+  group_by(ntrees_RF) %>%
+  summarize(n = n()/nrow(df)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$ntrees_RF, function(x){
+  plot <- plot_lasagna(ntrees_RF_las, 'ntrees_RF', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+
+percs <- round(sort_vals$n, 3)*100
+letters <- c('A) ', 'B) ', 'C) ' , 'D) ', 'E) ', 'F) ', 'G) ', 'H) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+ntrees_p <- plot_grid(plotlist = all_plots, labels = labels, nrow = 4,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+final <- plot_grid(white_space, ntrees_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 20, 0.6, .4,0.7))
+final
+```
+
+## Supplementary Figure 5
+
+```{r, warning = FALSE, fig.height = 12, fig.width =6.5}
+sort_vals <- df %>%
+  group_by(clust8_EV1234) %>%
+  summarize(n = n()/nrow(df)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$clust8_EV1234, function(x){
+  plot <- plot_lasagna(mat_las, 'clust8_EV1234', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+percs <- round(sort_vals$n, 3)*100
+percs[7] <- 2.1 #so it sums to 100
+letters <- c('A) ', 'B) ', 'C) ' , 'D) ', 'E) ', 'F) ', 'G) ', 'H) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+mat_p <- plot_grid(plotlist = all_plots, labels = labels, nrow = 4,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+final <- plot_grid(white_space, mat_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 20, 0.6, .4,0.7))
+final
+```
+
+## Supplementary Figure 6
+
+```{r, warning = FALSE, fig.height = 12, fig.width =6.5}
+sort_vals <- df %>%
+  group_by(clust8) %>%
+  summarize(n = n()/nrow(df)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$clust8, function(x){
+  plot <- plot_lasagna(hier_m_las, 'clust8', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+
+percs <- round(sort_vals$n, 4)*100
+percs[6] <- 0.23 #so it sums to 100
+letters <- c('A) ', 'B) ', 'C) ' , 'D) ', 'E) ', 'F) ', 'G) ', 'H) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+hier_p <- plot_grid(plotlist = all_plots, labels = labels, nrow = 4,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+final <- plot_grid(white_space, hier_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 20, 0.6, .4,0.7))
+final
+```
+
+## Supplementary Figure 7
+
+```{r, warning=FALSE, fig.height =4.5, fig.width =6.5}
+sort_vals <- ntrees_df %>%
+  group_by(ntrees_RF_p) %>%
+  summarize(n = n()/nrow(df)) %>%
+  arrange(desc(n))
+
+all_plots <- lapply(sort_vals$ntrees_RF_p, function(x){
+  plot <- plot_lasagna(ntrees_RF_p_las, 'ntrees_RF_p', x) +
+  theme(legend.position="none", axis.text.x = element_text(size = 11))
+})
+
+percs <- round(sort_vals$n, 3)*100
+letters <- c('A) ', 'B) ')
+labels <- vector(length = length(percs))
+for(i in seq(1,length(percs))){labels[i] <- paste0(letters[i], as.character(percs[i]), '%')}
+
+ntrees_p <- plot_grid(plotlist = all_plots, labels = labels, nrow =1,label_y = 1.04, label_x = -0.01, label_size = 13)
+
+final <- plot_grid(white_space, ntrees_p, white_space, legend_b, white_space,  axis = 'l', nrow = 5, rel_heights = c(0.6, 5, 0.6, .4,0.7))
+final
+```

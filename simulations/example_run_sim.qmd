@@ -1,0 +1,103 @@
+---
+title: "Example for Running Simulations"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Load packages and source files
+
+```{r}
+library(dplyr)
+library(readr)
+library(stringr)
+library(combinat)
+library(parallel)
+source('src/gen_seqs_funcs/sim_seq_functions.R')
+source('src/gen_seqs_funcs/get_TPMs.R')
+source('src/run_functions/calc_sim_clust.R')
+source('src/run_functions/clust_accuracy_functions.R')
+```
+
+## Simulate sequences
+
+We will simulate sequences from a first order Markov chain where clusters are driven by differences in state duration for two states (medium overlap). We will only generate 10 simulated sequence datasets so that this example can be computed quickly.
+
+Code is from scripts/generate_simulated_sequences/gen_sim_seqs.R
+
+```{r}
+P_all <- get_sim_TPMs(1)
+
+dir.create(file.path(paste0('simulated_sequences/order_', 1), 'dur2_med'))
+
+invisible(lapply(seq(0, 9), function(k){
+    #250 in the seq() function below defines the # of sequences per dataset
+    seq_data <- as.data.frame(t(sapply(seq(1 + 250*k,250 + 250*k), gen_clust_seq, P_list = P_all[['dur2_med']], order = 1, num.iters = 500, start_state = list(4,4,4), clust_prob = c(1/3, 1/3, 1/3))))
+   #write the simulated dataset to the folder we created above
+    write_csv(seq_data, paste0('simulated_sequences/order_', 1, '/', 'dur2_med', '/', k, '.csv'))
+  }))
+```
+
+## Run hierarchical clustering and adjacency matrix decomposition cluster on the simulated sequences
+
+Code is from scripts/run_clustering_methods/run_full_sim.R
+
+```{r, echo = TRUE, results = 'hide'}
+input_path <- 'simulated_sequences/order_1/dur2_med/'
+
+seeds <- seq(0, 9)
+out <- lapply(seeds, run_sim, path = input_path, min_num = 2, max_num = 6)
+
+clust_acc <- do.call(rbind, lapply(out, function(x){x[[1]]}))
+clust_metric <- do.call(rbind, lapply(out, function(x){x[[2]]}))
+```
+
+## Run nTreeClus
+
+nTreeClus is implemented in python, see example_run_sim_nTreeClus.ipynb. While the results of this file are saved in results/example_run_sim_ntrees_clust.csv we recommend actually running the notebook to fully understand how to implement the simulation.
+
+### Get nTreeClus accuracy
+
+Code is from scripts/run_clustering_methods/clean_ntrees.R
+
+```{r}
+res_df <- read_csv('results/example_run_sim_ntrees_clust.csv')
+  
+df_list <- lapply(seq(0, 9), function(i){
+    return(res_df %>% filter(seed == i))
+})
+  
+clean_res <- lapply(df_list, get_mult_acc)
+clean_res_df <- as.data.frame(do.call(rbind, clean_res))
+```
+
+## Compile results to get average accuracy and mode \# of clusters for each method
+
+```{r, include = FALSE}
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+```{r}
+clean_res_df <- clean_res_df %>%
+  rename(best_clust = best_num) %>%
+  mutate(type = 'ntrees')
+clust_acc_join <- clust_acc %>%
+  dplyr::select(raw_prop, best_clust, type, seed)
+
+acc_all <- rbind(clust_acc_join, clean_res_df) %>%
+  mutate(raw_prop = as.double(raw_prop))
+
+acc_all %>%
+  group_by(type) %>%
+  summarise('mode cluster #' = getmode(best_clust))
+
+acc_all %>%
+  group_by(type) %>%
+  summarise('mean accuracy' = mean(raw_prop))
+```

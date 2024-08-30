@@ -1,0 +1,231 @@
+---
+title: "Simulation Results Tables"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## Load packages
+
+```{r}
+library(readr)
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(stringr)
+library(kableExtra)
+```
+
+```{r, include = FALSE}
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+## First order Markov chain
+
+### Prep result data
+
+```{r}
+out_files <- list.files('results/order_1/')
+acc_files <- sort(out_files[str_detect(out_files, 'acc') == TRUE])
+
+acc_list <- list()
+for(i in seq(1,24)){
+  if(str_detect(acc_files[i], 'ntree') == FALSE){
+  df_i <- read_rds(paste0('results/order_1/', acc_files[i])) %>%
+    mutate(scenario = str_sub(acc_files[i],1, nchar(acc_files[i]) -21)) %>%
+    dplyr::select(-ARI, - ARI_best)
+  } else{
+    df_i <- read_rds(paste0('results/order_1/', acc_files[i])) %>%
+      rename(best_clust = best_num) %>%
+      mutate(type = 'ntrees') %>%
+      mutate(scenario = str_sub(acc_files[i],1, nchar(acc_files[i]) -20))
+  }
+  
+  acc_list[[i]] <- df_i
+}
+acc_df <- do.call(rbind, acc_list)
+
+#unique(acc_df$scenario)
+scen_levels <- c("state_low", "state_med", "state_high", "dur1_low", "dur1_med", "dur1_high", "dur2_low", "dur2_med", "dur2_high", "dur3_low", "dur3_med", "dur3_high")
+
+acc_df <- acc_df %>%
+  mutate(scenario = factor(scenario, levels = scen_levels)) %>%
+  mutate(raw_prop = as.numeric(raw_prop), best_clust = as.character(best_clust)) %>%
+  mutate(type = ifelse(type == 'mat', 'amdc', type)) %>%
+  mutate(type = factor(type, levels = c('hier', 'amdc', 'ntrees')))
+```
+
+### Table 1
+
+```{r}
+sum_acc <- acc_df %>%
+  arrange(scenario) %>%
+  group_by(scenario, type) %>%
+  summarize(sd = sd(raw_prop), raw_prop = mean(raw_prop), best_clust = getmode(best_clust)) %>%
+  ungroup() %>%
+  mutate(correct_clust = c(2,2,2,3,3,3,4,4,4, rep(3, 27))) %>%
+  group_by(scenario)
+sum_acc_clean <- sum_acc %>%
+  mutate(raw_prop = round(raw_prop, 2), sd = round(sd, 2)) %>%
+  mutate(table_val = paste0(raw_prop, ' (', sd,')'))
+
+sum_acc_wide <- sum_acc_clean %>%
+  dplyr::select(scenario, type, table_val) %>%
+  mutate(type = paste0(type, ' \n acc')) %>%
+  pivot_wider(names_from = type, values_from = table_val)
+sum_nclust_wide <- sum_acc_clean  %>%
+  dplyr::select(scenario, type, best_clust) %>%
+  mutate(type = paste0(type, ' \n num_clust')) %>%
+  pivot_wider(names_from = type, values_from = best_clust) %>%
+  ungroup() %>%
+  mutate(`true \n num_clust` = c(2,3,4,rep(3, 9)))
+sum_nclust_wide <- sum_nclust_wide[,c(1,5,2,3,4)]
+
+sum_all_wide <- sum_acc_wide %>%
+  full_join(sum_nclust_wide, by ='scenario')
+sum_all_wide %>%
+  kbl(format = "html", escape = F, caption = 'First order') %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+## Second order Markov chain
+
+### Prep result data
+
+```{r}
+out_files <- list.files('results/order_2/')
+acc_files <- sort(out_files[str_detect(out_files, 'acc') == TRUE])
+
+acc_list <- list()
+for(i in seq(1,24)){
+  if(str_detect(acc_files[i], 'ntree') == FALSE){
+  df_i <- read_rds(paste0('results/order_2/', acc_files[i])) %>%
+    mutate(scenario = str_sub(acc_files[i],1, nchar(acc_files[i]) -21)) %>%
+    dplyr::select(-ARI, - ARI_best)
+  } else{
+    df_i <- read_rds(paste0('results/order_2/', acc_files[i])) %>%
+      rename(best_clust = best_num) %>%
+      mutate(type = 'ntrees') %>%
+      mutate(scenario = str_sub(acc_files[i],1, nchar(acc_files[i]) -20))
+  }
+  
+  acc_list[[i]] <- df_i
+}
+acc_df2 <- do.call(rbind, acc_list)
+
+#unique(acc_df$scenario)
+scen_levels <- c("state_low", "state_med", "state_high", "dur1_low", "dur1_med", "dur1_high", "dur2_low", "dur2_med", "dur2_high", "dur3_low", "dur3_med", "dur3_high")
+
+acc_df2 <- acc_df2 %>%
+  mutate(scenario = factor(scenario, levels = scen_levels)) %>%
+  mutate(raw_prop = as.numeric(raw_prop), best_clust = as.character(best_clust)) %>%
+  mutate(type = ifelse(type == 'mat', 'amdc', type)) %>%
+  mutate(type = factor(type, levels = c('hier', 'amdc', 'ntrees')))
+```
+
+### Supplementary Table 1
+
+```{r}
+sum_acc2 <- acc_df2 %>%
+  arrange(scenario) %>%
+  group_by(scenario, type) %>%
+  summarize(sd = sd(raw_prop), raw_prop = mean(raw_prop), best_clust = getmode(best_clust)) %>%
+  ungroup() %>%
+  mutate(correct_clust = c(2,2,2,3,3,3,4,4,4, rep(3, 27))) %>%
+  group_by(scenario)
+sum_acc_clean2 <- sum_acc2 %>%
+  mutate(raw_prop = round(raw_prop, 2), sd = round(sd, 2)) %>%
+  mutate(table_val = paste0(raw_prop, ' (', sd,')'))
+
+sum_acc_wide2 <- sum_acc_clean2 %>%
+  dplyr::select(scenario, type, table_val) %>%
+  mutate(type = paste0(type, ' \n acc')) %>%
+  pivot_wider(names_from = type, values_from = table_val)
+sum_nclust_wide2 <- sum_acc_clean2  %>%
+  dplyr::select(scenario, type, best_clust) %>%
+  mutate(type = paste0(type, ' \n num_clust')) %>%
+  pivot_wider(names_from = type, values_from = best_clust) %>%
+  ungroup() %>%
+  mutate(`true \n num_clust` = c(2,3,4,rep(3, 9)))
+sum_nclust_wide2 <- sum_nclust_wide2[,c(1,5,2,3,4)]
+
+sum_all_wide2 <- sum_acc_wide2 %>%
+  full_join(sum_nclust_wide2, by ='scenario')
+sum_all_wide2 %>%
+  kbl(format = "html", escape = F, caption = 'Second order') %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+## Fifth order Markov chain
+
+### Prep result data
+
+```{r}
+out_files <- list.files('results/order_5/')
+acc_files <- sort(out_files[str_detect(out_files, 'acc') == TRUE])
+
+acc_list <- list()
+for(i in seq(1,24)){
+  if(str_detect(acc_files[i], 'ntree') == FALSE){
+  df_i <- read_rds(paste0('results/order_5/', acc_files[i])) %>%
+    mutate(scenario = str_sub(acc_files[i],1, nchar(acc_files[i]) -21)) %>%
+    dplyr::select(-ARI, - ARI_best)
+  } else{
+    df_i <- read_rds(paste0('results/order_5/', acc_files[i])) %>%
+      rename(best_clust = best_num) %>%
+      mutate(type = 'ntrees') %>%
+      mutate(scenario = str_sub(acc_files[i],1, nchar(acc_files[i]) -20))
+  }
+  
+  acc_list[[i]] <- df_i
+}
+acc_df5 <- do.call(rbind, acc_list)
+
+#unique(acc_df$scenario)
+scen_levels <- c("state_low", "state_med", "state_high", "dur1_low", "dur1_med", "dur1_high", "dur2_low", "dur2_med", "dur2_high", "dur3_low", "dur3_med", "dur3_high")
+
+acc_df5 <- acc_df5 %>%
+  mutate(scenario = factor(scenario, levels = scen_levels)) %>%
+  mutate(raw_prop = as.numeric(raw_prop), best_clust = as.character(best_clust)) %>%
+  mutate(type = ifelse(type == 'mat', 'amdc', type)) %>%
+  mutate(type = factor(type, levels = c('hier', 'amdc', 'ntrees')))
+```
+
+### Table 2
+
+```{r}
+sum_acc5 <- acc_df5 %>%
+  arrange(scenario) %>%
+  group_by(scenario, type) %>%
+  summarize(sd = sd(raw_prop), raw_prop = mean(raw_prop), best_clust = getmode(best_clust)) %>%
+  ungroup() %>%
+  mutate(correct_clust = c(2,2,2,3,3,3,4,4,4, rep(3, 27))) %>%
+  group_by(scenario)
+sum_acc_clean5 <- sum_acc5 %>%
+  mutate(raw_prop = round(raw_prop, 2), sd = round(sd, 2)) %>%
+  mutate(table_val = paste0(raw_prop, ' (', sd,')'))
+
+sum_acc_wide5 <- sum_acc_clean5 %>%
+  dplyr::select(scenario, type, table_val) %>%
+  mutate(type = paste0(type, ' \n acc')) %>%
+  pivot_wider(names_from = type, values_from = table_val)
+sum_nclust_wide5 <- sum_acc_clean5  %>%
+  dplyr::select(scenario, type, best_clust) %>%
+  mutate(type = paste0(type, ' \n num_clust')) %>%
+  pivot_wider(names_from = type, values_from = best_clust) %>%
+  ungroup() %>%
+  mutate(`true \n num_clust` = c(2,3,4,rep(3, 9)))
+sum_nclust_wide5 <- sum_nclust_wide5[,c(1,5,2,3,4)]
+
+sum_all_wide5 <- sum_acc_wide5 %>%
+  full_join(sum_nclust_wide5, by ='scenario')
+sum_all_wide5 %>%
+  kbl(format = "html", escape = F, caption = 'Fifth order') %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
