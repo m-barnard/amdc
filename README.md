@@ -8,7 +8,7 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 
     * [Simulation](#simulations-section-3)
   
-    * [Daynamica Aaalysis](#daynamica-analysis-section-4)
+    * [Daynamica analysis](#daynamica-analysis-section-4)
  
 *  [Example notebooks for running code](#example-notebooks-for-running-code)
   
