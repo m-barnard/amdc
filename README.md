@@ -25,7 +25,7 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 ## General information
 All analyses were run using R 4.4.0 and Python 3.8.3. The needed python libraries can be loaded as a conda environment using nTreeClus_environ.yaml
 
-In both src/ folders there is a file named ntrees_edit.py. The majority of this code is from https://github.com/HadiJahanshahi/nTreeClus nTreeClus.py file; however, some changes were made in order to run this method for our simulation setting parameters. 
+In both src/ folders there is a file named ntrees_edit.py. The majority of this code is from https://github.com/HadiJahanshahi/nTreeClus nTreeClus.py file; however, some changes were made in order to run this method for our simulation and Daynamica data analyses. 
 
 ## Reproducing figures, tables, and results
 
