@@ -82,10 +82,10 @@ Note: since computational time depends on the computational hardware/resources u
 * To aggregate results see daynamica_analysis/additional_analyses.qmd
 
 
-## Data (see daynamica_analysis/)
-> The main original, non-edited data files are found in raw_data/processed_ucal_items_without_surveys_small.csv and clean_data/survey_data.csv. The former is the epidsodic activity data and the later contains the response to the end of day survey question: "Indicate how much you agree with the following statement: Overall, I am concerned with having contracted Coronavirus today"
+## Data
+> The main original, non-edited data files are found in daynamica_analysis/raw_data/processed_ucal_items_without_surveys_small.csv and daynamica_analysis/clean_data/survey_data.csv. The former is the epidsodic activity data and the later contains the response to the end of day survey question: "Indicate how much you agree with the following statement: Overall, I am concerned with having contracted Coronavirus today"
 > 
-> raw_data/processed_ucal_items_without_surveys_small.csv data dictionary
+> daynamica_analysis/raw_data/processed_ucal_items_without_surveys_small.csv data dictionary
 >
 > | Variable | Meaning |
 > |---|---|
@@ -95,7 +95,7 @@ Note: since computational time depends on the computational hardware/resources u
 > | start_posix | Start date and time of the episode |
 > | end_posix | End date and time of the episode |
 >
-> clean_data/survey_data.csv data dictionary
+> daynamica_analysis/clean_data/survey_data.csv data dictionary
 >
 > | Variable | Meaning |
 > |---|---|
