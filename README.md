@@ -14,7 +14,7 @@ Code for running the method and replicating results, figures, and tables 'Adjace
   
 *  [Run analysis from R/python or shell scripts](#run-analysis-from-rpython-or-shell-scripts)
   
-    * [Simulation](#simulation)
+    * [Simulations](#simulations)
       
     * [Stability analysis](#stability-analysis)
  
@@ -60,7 +60,7 @@ All files are in daynamica_analysis/. While the cleaned data and calcualted dist
 
 For running all R scripts, the working directory needs to be set to the outer folder the script is stored in (either simulations/ or daynamica_analysis/).
 
-### Simulation
+### Simulations
 
 * To simulate the sequences (simulations/scripts/generate_simulated_sequences/): gen_sim_seqs.R with i = 1,2,5 or use gen_sim.sh
 * To run hierarchical clustering and AMDC on the simulated sequences (simulations/scripts/run_clustering_methods): run_full_sim.R with i = 1-36 or use run_all.sh
