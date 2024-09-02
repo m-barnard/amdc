@@ -2,7 +2,7 @@
 Code for running the method and replicating results, figures, and tables 'Adjacency Matrix Decomposition Clustering for Human Activity Data' (https://arxiv.org/abs/2401.01949) by Martha Barnard, Yingling Fan, Julian Wolfson.
 
 # Table of contents
-* [General information[(#general-information)]
+* [General information](#general-information)
   
 * [Replicating figures, tables and results](#reproducing-figures-tables-and-results)
 
@@ -12,7 +12,7 @@ Code for running the method and replicating results, figures, and tables 'Adjace
  
 *  [Example notebooks for running code](#example-notebooks-for-running-code)
   
-*  ['Run analysis from R/python or shell scripts'](#run-analysis-from-r-python-or-shell-scripts)
+*  ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts)
   
     * [Simulation](#simulation)
       
@@ -28,7 +28,7 @@ In both src/ folders there is a file named ntrees_edit.py. The majority of this 
 
 ## Reproducing figures, tables, and results
 
-All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/). Files/results below with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-r-python-or-shell-scripts) section below. 
+All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/). Files/results below with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts) section below. 
 
 ### Simulations (Section 3)
 
