@@ -12,7 +12,7 @@ Code for running the method and replicating results, figures, and tables 'Adjace
  
 *  [Example notebooks for running code](#example-notebooks-for-running-code)
   
-*  ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts)
+*  [Run analysis from R/python or shell scripts](#run-analysis-from-rpython-or-shell-scripts)
   
     * [Simulation](#simulation)
       
@@ -23,12 +23,15 @@ Code for running the method and replicating results, figures, and tables 'Adjace
 * [Data Documentation](#data-see-daynamica_analysis)
 
 ## General information
-All analyses were run use R 4.4.0 and Python 3.8.3. The needed python library versions can be loaded as a conda environment using nTreeClus_environ.yaml
-In both src/ folders there is a file named ntrees_edit.py. The majority of this code is from https://github.com/HadiJahanshahi/nTreeClus nTreeClus.py file; however, some changes were made in order to run this method given our simulation setting parameters. 
+All analyses were run using R 4.4.0 and Python 3.8.3. The needed python librarues can be loaded as a conda environment using nTreeClus_environ.yaml
+
+In both src/ folders there is a file named ntrees_edit.py. The majority of this code is from https://github.com/HadiJahanshahi/nTreeClus nTreeClus.py file; however, some changes were made in order to run this method for our simulation setting parameters. 
 
 ## Reproducing figures, tables, and results
 
-All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/). Files/results below with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts) section below. 
+All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/).
+
+Files/results below with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts) section below. 
 
 ### Simulations (Section 3)
 
@@ -39,7 +42,7 @@ All files in simulations/
 
 ### Daynamica analysis (Section 4)
 
-All files in daynamica_analysis/. While the cleaned data and calcualted distance matrices are already present in the repo, scripts/clean_seqs.R and get_dist_mats.R can be used to produce this data.
+All files in daynamica_analysis/. While the cleaned data and calcualted distance matrices are already present in the repo, scripts/clean_seqs.R and scripts/get_dist_mats.R can be used to produce this data.
 
 * run_nTreeClus_daynamica.ipynb runs nTreeClus on Daynamica day and week sequences and saves the results
 * figures_day_analysis.qmd runs AMDC and hierarchical clustering on Daynamica day sequences and produces Figure 2 and Supplementary Figures 4-7
@@ -50,7 +53,7 @@ All files in daynamica_analysis/. While the cleaned data and calcualted distance
 
 ##  Example notebooks for running code
 
-* example_run_sim.qmd and example_run_sim_nTreeClus.ipynb shows how to run the simulation (from simulating the sequences to aggregating the results) for a single simulation scenario
+* example_run_sim.qmd and example_run_sim_nTreeClus.ipynb show how to run the simulation (from simulating the sequences to aggregating the results) for a single simulation scenario
 * run_any_data.qmd shows how to run AMDC on any data source
 
 ## Run analysis from R/python or shell scripts
@@ -71,7 +74,7 @@ For running all R scripts, the working directory needs to be set to the outer fo
 
 ### Computational time analysis
 
-Note: since computational time depends on the computational hardware/resources used, the results in Section 4.4 cannot be perfectly replicated when running the analysis again. However, the code can be run to determine computational time on one's personal computation hardware/resources.
+Note: since computational time depends on the computational hardware/resources used, the results in Section 4.4 cannot be perfectly replicated when running the analysis again. However, the code can be run to determine computational time on one's personal computational hardware/resources.
 
 * To run computational time analysis for hierarchical clustering and AMDC: daynamica_analysis/scripts/run_time_msi.R
 * To run computational time analysis for nTreeClus: daynamica_analysis/scripts/ntrees_time.py
@@ -88,7 +91,7 @@ Note: since computational time depends on the computational hardware/resources u
 > |---|---|
 > | user_id | Unique user identifyer |
 > | type | Describes episode: either ACTIVITY or TRIP |
-> | subtype | Describes activity/trip category of episode: <br>HOME, CAR, PERSONAL_BUSINESS, <br>LEISURE_RECREATION, EAT_OUT,WALK, <br>SHOP, OTHER, WORK, EDUCATION, > ><br>BIKE, RAIL, BUS |
+> | subtype | Describes activity/trip category of episode: <br>HOME, CAR, PERSONAL_BUSINESS, <br>LEISURE_RECREATION, EAT_OUT,WALK, <br>SHOP, OTHER, WORK, EDUCATION, <br>BIKE, RAIL, BUS |
 > | start_posix | Start date and time of the episode |
 > | end_posix | End date and time of the episode |
 >
