@@ -53,6 +53,8 @@ All files are in daynamica_analysis/. While the cleaned data and calcualted dist
 
 ##  Example notebooks for running code
 
+The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/).
+
 * example_run_sim.qmd and example_run_sim_nTreeClus.ipynb show how to run the simulation (from simulating the sequences to aggregating the results) for a single simulation scenario
 * run_any_data.qmd shows how to run AMDC on any data source
 
