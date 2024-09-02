@@ -31,18 +31,18 @@ In both src/ folders there is a file named ntrees_edit.py. The majority of this 
 
 All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/).
 
-Files/results below with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts) section below. 
+Files/results below labelled with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts) section below. 
 
 ### Simulations (Section 3)
 
-All files in simulations/
+All files are in simulations/
 
 * figures.qmd simulates sequences and produces Supplementary Figures 1-3
 * tables.qmd produces Tables 1-2 and Supplementary Table 1 (!)
 
 ### Daynamica analysis (Section 4)
 
-All files in daynamica_analysis/. While the cleaned data and calcualted distance matrices are already present in the repo, scripts/clean_seqs.R and scripts/get_dist_mats.R can be used to produce this data.
+All files are in daynamica_analysis/. While the cleaned data and calcualted distance matrices are already present in the repo, scripts/clean_seqs.R and scripts/get_dist_mats.R can be used to produce this data.
 
 * run_nTreeClus_daynamica.ipynb runs nTreeClus on Daynamica day and week sequences and saves the results
 * figures_day_analysis.qmd runs AMDC and hierarchical clustering on Daynamica day sequences and produces Figure 2 and Supplementary Figures 4-7
@@ -62,9 +62,9 @@ For running all R scripts, the working directory needs to be set to the outer fo
 
 ### Simulation
 
-* Simulate the sequences (simulations/scripts/generate_simulated_sequences/): gen_sim_seqs.R with i = 1,2,5 or use gen_sim.sh
-* Run hierarchical clustering and AMDC on the simulated sequences (simulations/scripts/run_clustering_methods): run_full_sim.R with i = 1-36 or use run_all.sh
-* Run nTreeClus on the simulated sequences (simulations/scripts/run_clustering_methods): run_ntress.py with i = 1-36 or use run_all_ntrees.sh. After this is completed, run clean_ntress.R
+* To simulate the sequences (simulations/scripts/generate_simulated_sequences/): gen_sim_seqs.R with i = 1,2,5 or use gen_sim.sh
+* To run hierarchical clustering and AMDC on the simulated sequences (simulations/scripts/run_clustering_methods): run_full_sim.R with i = 1-36 or use run_all.sh
+* To run nTreeClus on the simulated sequences (simulations/scripts/run_clustering_methods): run_ntress.py with i = 1-36 or use run_all_ntrees.sh. After this is completed, run clean_ntress.R
 * To aggregate results see simulations/tables.qmd
 
 ### Stability analysis
@@ -95,7 +95,7 @@ Note: since computational time depends on the computational hardware/resources u
 > | start_posix | Start date and time of the episode |
 > | end_posix | End date and time of the episode |
 >
-> clean_data/survey_data.csv
+> clean_data/survey_data.csv data dictionary
 >
 > | Variable | Meaning |
 > |---|---|
