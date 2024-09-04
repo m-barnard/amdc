@@ -42,7 +42,7 @@ All files are in simulations/
 
 ### Daynamica analysis (Section 4)
 
-All files are in daynamica_analysis/. While the cleaned data and calcualted distance matrices are already present in the repo, scripts/clean_seqs.R and scripts/get_dist_mats.R can be used to produce this data.
+All files are in daynamica_analysis/. While the cleaned data and calculated distance matrices are already present in the repo, scripts/clean_seqs.R and scripts/get_dist_mats.R can be used to produce this data.
 
 * run_nTreeClus_daynamica.ipynb runs nTreeClus on Daynamica day and week sequences and saves the results
 * figures_day_analysis.qmd runs AMDC and hierarchical clustering on Daynamica day sequences and produces Figure 2 and Supplementary Figures 4-7
