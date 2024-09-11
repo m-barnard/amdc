@@ -18,7 +18,7 @@ import multiprocessing
 # output: all data is saved as csv within results/order_{}/ and named by simulation scenario
 ######################
 
-#keep this setting if running code on a slurm cluster, otherwise set i manually 1-36
+#keep this setting if running code on a slurm cluster, otherwise set i manually 0-35
 i = int(sys.argv[1])
 path = os.path.abspath(os.path.join(os.getcwd() ,"../.."))
 
