@@ -1,5 +1,5 @@
 # amdc_clustering
-Code for running the method and replicating results, figures, and tables 'Adjacency Matrix Decomposition Clustering for Human Activity Data' (https://arxiv.org/abs/2401.01949) by Martha Barnard, Yingling Fan, Julian Wolfson.
+Code for running the method and replicating results, figures, and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data' (https://arxiv.org/abs/2401.01949) by Martha Barnard, Yingling Fan, Julian Wolfson.
 
 # Table of contents
 * [General information](#general-information)
@@ -66,7 +66,7 @@ For running all R scripts, the working directory needs to be set to the outer fo
 
 * To simulate the sequences (simulations/scripts/generate_simulated_sequences/): gen_sim_seqs.R with i = 1,2,5 or use gen_sim.sh
 * To run hierarchical clustering and AMDC on the simulated sequences (simulations/scripts/run_clustering_methods): run_full_sim.R with i = 1-36 or use run_all.sh
-* To run nTreeClus on the simulated sequences (simulations/scripts/run_clustering_methods): run_ntress.py with i = 1-36 or use run_all_ntrees.sh. After this is completed, run clean_ntress.R
+* To run nTreeClus on the simulated sequences (simulations/scripts/run_clustering_methods): run_ntress.py with i = 0-35 or use run_all_ntrees.sh. After this is completed, run clean_ntrees.R
 * To aggregate results see simulations/tables.qmd
 
 ### Stability analysis
