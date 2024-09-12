@@ -1,5 +1,5 @@
 # amdc_clustering
-Code for running the method and replicating results, figures, and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data' (https://arxiv.org/abs/2401.01949) by Martha Barnard, Yingling Fan, Julian Wolfson.
+Code for running the method and replicating results, figures, and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data'.
 
 # Table of contents
 * [General information](#general-information)
