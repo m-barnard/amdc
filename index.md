@@ -1,7 +1,7 @@
 ---
 layout: default
 title: AMDC Clustering Rendered Documents
-description: Replicating results, figures and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data' (https://arxiv.org/abs/2401.01949) by Martha Barnard, Yingling Fan, Julian Wolfson.
+description: Replicating results, figures and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data'.
 ---
 
 # Simulations
