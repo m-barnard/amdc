@@ -29,7 +29,7 @@ In both src/ folders there is a file named ntrees_edit.py. The majority of this 
 
 ## Reproducing figures, tables, and results
 
-All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/).
+All figures, tables, and results are reproduced in .qmd or .ipynb files. The headings in these files label which figures/tables/results are being replicated. The rendered files can be found at the [GitHub pages for this repo](#https://m-barnard.github.io/amdc_clustering/).
 
 Files/results below labelled with (!) recreate tables by reading in results rather than by running the analysis (this was done for computational reasons). To actually run these analyses see the ['Run analysis from R/python or shell scripts'](#run-analysis-from-rpython-or-shell-scripts) section below. 
 
@@ -53,7 +53,7 @@ All files are in daynamica_analysis/. While the cleaned data and calculated dist
 
 ##  Example notebooks for running code
 
-The rendered files can be found at the GitHub pages for this repo (https://m-barnard.github.io/amdc_clustering/).
+The rendered files can be found at the [GitHub pages for this repo](#https://m-barnard.github.io/amdc_clustering/).
 
 * example_run_sim.qmd and example_run_sim_nTreeClus.ipynb show how to run the simulation (from simulating the sequences to aggregating the results) for a single simulation scenario
 * run_any_data.qmd shows how to run AMDC on any data source
