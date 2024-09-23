@@ -27,10 +27,9 @@ agg_df1 <- all_df %>%
   group_by(uniq_id, clust8_EV1234) %>%
   summarise(jac = mean(jac)) %>%
   ungroup()
-mean(agg_df1$jac) #0.7932195 is the overall score across all clusters, pretty good!
-median(agg_df1$jac) #0.875684 is the median of this, again pretty good!!
+mean(agg_df1$jac) #0.7932195 
+median(agg_df1$jac) #0.875684 
 
-#generally very good for the home and work cluster, pretty good for all other clusters except 2
 agg_df2_med <- agg_df1 %>%
   group_by(clust8_EV1234) %>%
   summarise(jac = median(jac))
