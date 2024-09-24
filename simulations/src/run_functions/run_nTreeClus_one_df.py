@@ -35,4 +35,3 @@ def get_clust_res(df_num, path, inputs):
 
     best_df = pd.DataFrame({'best_num': [best_num]*len(best_clust), 'best_clust': best_clust, 'true_clust': df.loc[:,'cluster'].tolist(), 'seed': [df_num]*len(best_clust)})
     return(best_df)
-    return(print(os.getcwd()))
