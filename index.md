@@ -1,8 +1,6 @@
----
-layout: default
-title: AMDC Clustering Rendered Documents
-description: Replicating results, figures and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data'.
----
+
+# AMDC Clustering Rendered Documents
+## Replicating results, figures and tables from 'Adjacency Matrix Decomposition Clustering for Human Activity Data'
 
 # Simulations
 > [Figures](./simulations/rendered_documents/figures.html)
